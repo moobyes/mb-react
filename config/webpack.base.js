@@ -1,36 +1,42 @@
-const path = require("path");
-const DIST_PATH = path.resolve(__dirname, "../dist");
-const APP_PATH = path.resolve(__dirname, "../app");
-const webpack = require("webpack");
-const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const notifier = require("node-notifier");
+const path = require('path');
+const webpack = require('webpack');
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const notifier = require('node-notifier');
+const postcss = require('postcss-import');
+const autoFixer = require('autoprefixer');
+const { port, outPutDir } = require('../config');
 
-const config = {
+console.log(`端口为:${port}`);
+
+const fileDir = `../${outPutDir}`;
+const DIST_PATH = path.resolve(__dirname, fileDir);
+// const APP_PATH = path.resolve(__dirname, "../app"); // todo
+
+const urlConfig = {
   dev: {
     https: null,
-    host: "localhost",
-    port: "8088",
+    host: 'localhost',
   },
 };
 
 module.exports = {
   resolve: {
-    extensions: [".js", ".jsx", ".json", ".scss", ".less"],
+    extensions: ['.js', '.jsx', '.json', '.scss', '.less'],
     // alias: {
     //   '@': resolve('src')
     // }
   },
   entry: {
     // app: "./app/index.js",
-    app: path.join(__dirname, "../src/App.jsx"),
-    framework: ["react", "react-dom"],
+    app: path.join(__dirname, '../src/App.jsx'),
+    framework: ['react', 'react-dom'],
   },
   output: {
     path: DIST_PATH,
-    filename: "./js/[name].[hash:16].js",
+    filename: './js/[name].[hash:16].js',
   },
   module: {
     unknownContextCritical: false,
@@ -40,9 +46,9 @@ module.exports = {
         test: /\.(js|jsx)$/,
         use: [
           {
-            loader: "babel-loader",
+            loader: 'babel-loader',
             options: {
-              presets: ["@babel/preset-env", "@babel/preset-react"],
+              presets: ['@babel/preset-env', '@babel/preset-react'],
             },
           },
         ],
@@ -51,50 +57,50 @@ module.exports = {
         test: /\.html$/,
         use: [
           {
-            loader: "html-loader",
+            loader: 'html-loader',
           },
         ],
       },
       {
         test: /\.(css|scss)$/,
-        include: path.resolve(__dirname, "../src"),
+        include: path.resolve(__dirname, '../src'),
         use: ExtractTextPlugin.extract({
-          fallback: "style-loader",
+          fallback: 'style-loader',
           use: [
             {
-              loader: "css-loader",
+              loader: 'css-loader',
               options: {
                 modules: {
-                  mode: "local",
-                  localIdentName: "[path][name]_[local]--[hash:base64:5]",
+                  mode: 'local',
+                  localIdentName: '[path][name]_[local]--[hash:base64:5]',
                 },
-                localsConvention: "camelCase",
+                localsConvention: 'camelCase',
               },
             },
             {
-              loader: "postcss-loader",
+              loader: 'postcss-loader',
               options: {
                 plugins: (loader) => [
-                  require("postcss-import")({
+                  postcss({
                     root: loader.resourcePath,
                   }),
-                  require("autoprefixer")(),
+                  autoFixer(),
                 ],
               },
             },
             {
-              loader: "sass-loader",
+              loader: 'sass-loader',
               options: {
                 sourceMap: true,
               },
             },
             {
-              loader: "sass-resources-loader",
+              loader: 'sass-resources-loader',
               options: {
                 sourceMap: true,
                 resources: [
-                  path.resolve(__dirname, "../src/assets/css/global.scss"),
-                ], //一定是path.resolve的绝对路径
+                  path.resolve(__dirname, '../src/assets/css/global.scss'),
+                ], // 一定要path.resolve的绝对路径，加载全局样式
               },
             },
           ],
@@ -102,28 +108,28 @@ module.exports = {
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: ["file-loader"],
-        //注意后面那个limit的参数，当你图片大小小于这个限制的时候，会自动启用base64编码图片
+        use: ['file-loader'],
+        // 注意后面那个limit的参数，当你图片大小小于这个限制的时候，会自动启用base64编码图片
         exclude: /node_modules/,
       },
       {
         test: /\.(jpg|png|svg|gif)$/,
         use: {
-          loader: "url-loader",
+          loader: 'url-loader',
           options: {
             limit: 1024,
-            name: "./images/[hash].[ext]",
+            name: './images/[hash].[ext]',
           },
         },
-        //注意后面那个limit的参数，当你图片大小小于这个限制的时候，会自动启用base64编码图片
+        // 注意后面那个limit的参数，当你图片大小小于这个限制的时候，会自动启用base64编码图片
         exclude: /node_modules/,
       },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "template/index.html",
-      inject: "body",
+      template: 'template/index.html',
+      inject: 'body',
       minify: {
         removeComments: true,
         collapseWhitespace: true,
@@ -133,30 +139,30 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new FriendlyErrorsWebpackPlugin({
       compilationSuccessInfo: {
-        notes: ["欢迎使用diy-react"],
         messages: [
           `Your application is running here: ${
-            config.dev.https ? "https" : "http"
-          }://${config.dev.host}:${config.dev.port}`,
+            urlConfig.dev.https ? 'https' : 'http'
+          }://${urlConfig.dev.host}:${port}`,
         ],
+        notes: ['欢迎使用mb-react'],
       },
       onErrors: (severity, errors) => {
-        console.log("错误：", severity, errors);
-        if (severity !== "error") {
+        console.log('错误：', severity, errors);
+        if (severity !== 'error') {
           return;
         }
         const error = errors[0];
         notifier.notify({
-          title: "Webpack error",
-          message: severity + ": " + error.name,
-          subtitle: error.file || "",
-          icon: "ICON",
+          title: 'Webpack error',
+          message: `${severity}: ${error.name}`,
+          subtitle: error.file || '',
+          icon: 'ICON',
         });
       },
       clearConsole: true,
     }),
     new ExtractTextPlugin({
-      filename: "./css/[name][hash].css",
+      filename: './css/[name][hash].css',
     }),
     new CleanWebpackPlugin(),
     // ({
@@ -168,13 +174,13 @@ module.exports = {
   ],
   optimization: {
     splitChunks: {
-      chunks: "all",
+      chunks: 'all',
       minChunks: 1,
       minSize: 0,
       cacheGroups: {
         framework: {
-          test: "framework",
-          name: "framework",
+          test: 'framework',
+          name: 'framework',
           enforce: true,
         },
       },

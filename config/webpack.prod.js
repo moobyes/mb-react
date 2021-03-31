@@ -1,18 +1,26 @@
-const merge = require("webpack-merge");
-const baseWebpackConfig = require("./webpack.base");
-const optimizeCss = require("optimize-css-assets-webpack-plugin");
+/*
+ * @Description: 生产配置
+ * @Author: Moobye
+ * @Date: 2020-08-06 13:20:01
+ * @LastEditTime: 2021-01-27 14:48:55
+ * @LastEditors: Moobye
+ */
+const merge = require('webpack-merge');
+const OptimizeCss = require('optimize-css-assets-webpack-plugin');
+const cssnano = require('cssnano');
+const baseWebpackConfig = require('./webpack.base');
 
 module.exports = merge(baseWebpackConfig, {
-  mode: "production",
+  mode: 'production',
   plugins: [
-    new optimizeCss({
-      cssProcessor: require('cssnano'),
+    new OptimizeCss({
+      cssProcessor: cssnano,
       cssProcessorOptions: {
         discardComments: {
-          removeAll: true
-        }
+          removeAll: true,
+        },
       },
-      canPrint: true
+      canPrint: true,
     }),
-  ]
+  ],
 });
