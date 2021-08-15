@@ -2,7 +2,7 @@
  * @Description: eslint 配置
  * @Author: Moobye
  * @Date: 2021-01-27 14:22:22
- * @LastEditTime: 2021-01-27 17:36:47
+ * @LastEditTime: 2021-04-29 14:54:23
  * @LastEditors: Moobye
  */
 module.exports = {
@@ -24,6 +24,7 @@ module.exports = {
   },
   plugins: [
     'react',
+    'react-hooks',
   ],
   rules: {
     'no-console': 'off',
@@ -31,6 +32,8 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-unresolved': 'off', // 关闭认不出路径的检测
     'react/prop-types': ['off'],
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
     'jsx-a11y/label-has-associated-control': ['error', {
       required: {
         some: ['nesting', 'id'],
